@@ -1,14 +1,34 @@
 from json import JSONDecoder
+from typing import Optional, List
 
 from pydantic import BaseModel
 
 
-class MessageErrorResponse(BaseModel, JSONDecoder):
+class Message(BaseModel, JSONDecoder):
+    """
+    Mensaje de salida para errores
+    """
     msg: str
     type: str
 
 
+class MessageErrorResponse(BaseModel):
+    """
+    Mensajes de respuesta de los errores
+    """
+    detail: Optional[List[Message]]
+
+    def __init__(self, msg: str, type: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.detail = []
+        msg = Message(msg=msg, type=type)
+        self.detail.append(msg)
+
+
 class AppException(Exception):
+    """
+    Errores de la aplicación
+    """
     def __init__(
             self,
             message: str,
@@ -18,6 +38,9 @@ class AppException(Exception):
 
 
 class NotFoundException(AppException):
+    """
+    Objecto no encontrado
+    """
     def __init__(
             self
     ) -> None:
@@ -25,6 +48,9 @@ class NotFoundException(AppException):
 
 
 class ExistsEmailException(AppException):
+    """
+    El email ya existe
+    """
     def __init__(
             self
     ) -> None:

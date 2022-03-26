@@ -3,11 +3,11 @@ from unittest import TestCase
 
 from app.domain.models.exception import ExistsEmailException, NotFoundException
 from app.domain.models.user import UserCreate
-from app.domain.usecase.crud_use_case import CrudUseCase
+from app.domain.usecase.crud_user_use_case import CrudUserUseCase
 from app.repository.user_repository_in_memory_impl import UserRepositoryInMemoryImpl
 
 
-class TestCrudUseCase(TestCase):
+class TestCrudUserUseCase(TestCase):
     def setUp(self):
         self.user_data = {
             'name': 'UserName',
@@ -19,7 +19,7 @@ class TestCrudUseCase(TestCase):
     def test_execute_create(self):
         repo = UserRepositoryInMemoryImpl()
         repo.delete_all()
-        use_case = CrudUseCase(repository=repo)
+        use_case = CrudUserUseCase(repository=repo)
 
         user: UserCreate = UserCreate(**self.user_data)
         user_created = use_case.execute_create(user)
@@ -36,10 +36,14 @@ class TestCrudUseCase(TestCase):
     def test_execute_update(self):
         repo = UserRepositoryInMemoryImpl()
         repo.delete_all()
-        use_case = CrudUseCase(repository=repo)
+        use_case = CrudUserUseCase(repository=repo)
 
         user: UserCreate = UserCreate(**self.user_data)
+        data = self.user_data
+        data['email'] = 'email2@email.com'
+        user2: UserCreate = UserCreate(**data)
         user_created = use_case.execute_create(user).copy()
+        user_created2 = use_case.execute_create(user2).copy()
         user_created.name = 'OtherName'
         user_created.email = 'another.ameil@email.com'
         user_update = use_case.execute_update(user_created)
@@ -47,16 +51,17 @@ class TestCrudUseCase(TestCase):
         self.assertEqual(user_created.id, user_update.id)
         user_not_found = user_update.copy()
         user_not_found.id = uuid.uuid1()
-        with self.assertRaises(ExistsEmailException):
-            use_case.execute_update(user_not_found)
-        user_not_found.email = 'new@email.com'
         with self.assertRaises(NotFoundException):
             use_case.execute_update(user_not_found)
+        user_exist_email = user_created2.copy()
+        user_exist_email.email = 'another.ameil@email.com'
+        with self.assertRaises(ExistsEmailException):
+            use_case.execute_update(user_exist_email)
 
     def test_execute_detail(self):
         repo = UserRepositoryInMemoryImpl()
         repo.delete_all()
-        use_case = CrudUseCase(repository=repo)
+        use_case = CrudUserUseCase(repository=repo)
 
         user: UserCreate = UserCreate(**self.user_data)
         user_created = use_case.execute_create(user).copy()
@@ -66,7 +71,7 @@ class TestCrudUseCase(TestCase):
     def test_execute_all(self):
         repo = UserRepositoryInMemoryImpl()
         repo.delete_all()
-        use_case = CrudUseCase(repository=repo)
+        use_case = CrudUserUseCase(repository=repo)
 
         user: UserCreate = UserCreate(**self.user_data)
         use_case.execute_create(user)
@@ -79,7 +84,7 @@ class TestCrudUseCase(TestCase):
     def test_execute_delete(self):
         repo = UserRepositoryInMemoryImpl()
         repo.delete_all()
-        use_case = CrudUseCase(repository=repo)
+        use_case = CrudUserUseCase(repository=repo)
 
         user: UserCreate = UserCreate(**self.user_data)
         user_created = use_case.execute_create(user)

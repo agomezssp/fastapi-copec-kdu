@@ -4,11 +4,12 @@ import uuid
 from fastapi.testclient import TestClient
 from starlette import status
 
+from app.dependencies import get_settings
 from app.domain.models.user import User
 from app.main import app
 from unittest import TestCase
 
-headers = {"X-Api-Key": "qwerty"}
+headers = {"X-Api-Key": get_settings().x_api_key}
 
 
 class Test(TestCase):
@@ -23,7 +24,6 @@ class Test(TestCase):
             "email": "email@mail.com",
             "birth_date": "2000-10-20"
         })
-        print(response.json())
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertIsNotNone(response.json())
 

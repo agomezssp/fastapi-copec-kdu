@@ -7,11 +7,11 @@ class TestAppException(TestCase):
     def test_init(self):
         ex = AppException(message='Test', type='type')
         self.assertIsNotNone(ex)
-        self.assertEqual('Test', ex.error.msg)
+        self.assertEqual('Test', ex.error.detail[0].msg)
 
 
 class TestNotFoundException(TestCase):
     def test_init(self):
         ex = NotFoundException()
         self.assertIsNotNone(ex)
-        self.assertEqual('No encontrado', ex.error.msg)
+        self.assertEqual('No encontrado', ex.error.detail[0].msg)
