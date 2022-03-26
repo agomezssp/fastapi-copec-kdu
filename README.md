@@ -52,6 +52,14 @@ Comando para ejecutar la aplicación en Producción
 ```shell
 uvicorn app.main:app --port 5000
 ```
+
+Ejecutar servicio en Contenedor Docker:
+
+```shell
+docker build -t demo1 ./ 
+docker run --env X_API_KEY=1234 -p 8000:80 demo1 
+```
+
 ### Documentación de los servicios
 Acceder a la siguiente URL para ver la documentación de los métodos:
 (http://localhost:8000/docs)
