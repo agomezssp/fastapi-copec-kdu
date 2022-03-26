@@ -28,6 +28,8 @@ python -m unittest
 
 Test de covertura:
 ```shell
+deactivate
+source venv/bin/activate
 coverage run -m unittest
 #Ran 16 tests in 0.106s
 #OK
